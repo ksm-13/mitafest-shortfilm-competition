@@ -1,0 +1,1330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Box Office - Short Film Competition | MIT</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0a0a0a; --deep: #111111; --yellow: #FFD600;
+    --blue: #1565C0; --blue-light: #1976D2; --blue-bright: #42A5F5;
+    --white: #F5F5F0; --gray: #2a2a2a; --gray-light: #3a3a3a;
+    --text-muted: #888; --error: #ef5350; --success: #43a047;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--black); color: var(--white); font-family: 'Barlow', sans-serif; font-weight: 400; overflow-x: hidden; }
+
+  /* FILMSTRIP */
+  .filmstrip { height: 28px; background: var(--yellow); display: flex; align-items: center; overflow: hidden; }
+  .filmstrip-inner { display: flex; gap: 6px; animation: ticker 20s linear infinite; white-space: nowrap; padding: 0 12px; }
+  .filmstrip span { font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 3px; color: var(--black); padding: 0 18px; }
+  @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+  /* HERO */
+  .hero { position: relative; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 60px 24px 80px; overflow: hidden; }
+  .hero-bg { position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(21,101,192,0.18) 0%, transparent 70%), radial-gradient(ellipse 40% 40% at 20% 80%, rgba(255,214,0,0.06) 0%, transparent 60%), repeating-linear-gradient(0deg, transparent, transparent 59px, rgba(255,255,255,0.02) 60px), repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(255,255,255,0.02) 60px); z-index: 0; }
+  .hero-glow { position: absolute; width: 600px; height: 600px; border-radius: 50%; background: radial-gradient(circle, rgba(21,101,192,0.25) 0%, transparent 70%); top: 50%; left: 50%; transform: translate(-50%,-50%); z-index: 0; animation: pulse 4s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { transform: translate(-50%,-50%) scale(1); } 50% { transform: translate(-50%,-50%) scale(1.1); opacity:0.7; } }
+  .hero-content { position: relative; z-index: 2; max-width: 900px; }
+  .org-badge { display: inline-flex; align-items: center; gap: 10px; background: rgba(255,214,0,0.1); border: 1px solid rgba(255,214,0,0.3); padding: 8px 20px; border-radius: 2px; margin-bottom: 40px; font-family: 'Barlow Condensed', sans-serif; font-size: 13px; letter-spacing: 3px; color: var(--yellow); text-transform: uppercase; }
+  .org-badge::before { content:''; width:6px; height:6px; background:var(--yellow); border-radius:50%; animation:blink 1.5s ease-in-out infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .hero-eyebrow { font-family:'Barlow Condensed',sans-serif; font-size:16px; letter-spacing:6px; color:var(--blue-bright); text-transform:uppercase; margin-bottom:16px; }
+  .hero-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(72px,12vw,140px); line-height:0.9; letter-spacing:4px; margin-bottom:8px; }
+  .hero-title .accent { color:var(--yellow); }
+  .hero-title .line2 { color:var(--blue-bright); }
+  .hero-subtitle { font-family:'Bebas Neue',sans-serif; font-size:clamp(28px,5vw,52px); letter-spacing:8px; color:rgba(245,245,240,0.4); margin-bottom:50px; }
+  .event-details-strip { display:flex; justify-content:center; flex-wrap:wrap; gap:2px; margin-bottom:60px; }
+  .detail-card { background:var(--deep); border:1px solid var(--gray-light); padding:20px 32px; min-width:160px; position:relative; overflow:hidden; }
+  .detail-card::before { content:''; position:absolute; top:0;left:0;right:0; height:2px; background:var(--yellow); }
+  .detail-card.blue-accent::before { background:var(--blue-bright); }
+  .detail-card-label { font-family:'Barlow Condensed',sans-serif; font-size:10px; letter-spacing:3px; color:var(--text-muted); text-transform:uppercase; margin-bottom:8px; }
+  .detail-card-value { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:2px; }
+  .detail-card-value.yellow { color:var(--yellow); }
+  .detail-card-value.blue { color:var(--blue-bright); }
+  .about-section { max-width:680px; margin:0 auto 50px; }
+  .about-section p { font-size:16px; line-height:1.8; color:rgba(245,245,240,0.65); font-weight:300; }
+  .rules-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:2px; max-width:900px; margin:0 auto 60px; text-align:left; }
+  .rule-item { background:var(--deep); border:1px solid var(--gray); padding:20px 24px; }
+  .rule-num { font-family:'Bebas Neue',sans-serif; font-size:40px; color:rgba(255,214,0,0.12); line-height:1; margin-bottom:8px; }
+  .rule-text { font-size:13px; line-height:1.6; color:rgba(245,245,240,0.7); font-weight:300; }
+  .rule-text strong { color:var(--yellow); font-weight:600; }
+  /* ── GUIDELINES ── */
+  .guidelines-wrap {
+    width: 100%; max-width: 960px; margin: 0 auto 20px;
+    display: flex; flex-direction: column; gap: 3px;
+    text-align: left;
+  }
+  .gl-section {
+    background: var(--deep);
+    border: 1px solid var(--gray);
+    overflow: hidden;
+  }
+  .gl-section-head {
+    display: flex; align-items: center; gap: 16px;
+    padding: 18px 28px;
+    background: var(--gray);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .gl-section-icon { font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 2px; color: var(--blue-bright); background: rgba(66,165,245,0.1); border: 1px solid rgba(66,165,245,0.25); padding: 4px 10px; flex-shrink: 0; }
+  .gl-section-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px; letter-spacing: 3px; color: var(--blue-bright);
+    text-transform: uppercase; margin-bottom: 2px;
+  }
+  .gl-section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px; letter-spacing: 3px; color: var(--white);
+  }
+  .gl-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1px;
+    background: rgba(255,255,255,0.04);
+    padding: 1px;
+  }
+  .gl-grid--2 { grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); }
+  .gl-item {
+    display: flex; gap: 14px; align-items: flex-start;
+    padding: 18px 22px;
+    background: #141414;
+    transition: background 0.15s;
+  }
+  .gl-item:hover { background: #1a1a1a; }
+  .gl-item--deadline { background: rgba(255, 152, 0, 0.05); }
+  .gl-item--deadline:hover { background: rgba(255, 152, 0, 0.08); }
+  .gl-item--prize { background: rgba(255, 214, 0, 0.05); align-items: center; }
+  .gl-item--prize:hover { background: rgba(255, 214, 0, 0.08); }
+  .gl-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px; color: rgba(255,214,0,0.35);
+    line-height: 1; flex-shrink: 0; min-width: 28px;
+    padding-top: 1px;
+  }
+  .prize-num { font-size: 18px; color: rgba(255,214,0,0.35); }
+  .gl-text {
+    font-size: 13px; line-height: 1.7;
+    color: rgba(245,245,240,0.65); font-weight: 300;
+  }
+  .gl-text strong { color: var(--white); font-weight: 600; }
+  .gl-text em { color: var(--text-muted); font-style: italic; }
+  .deadline-badge {
+    display: inline-block;
+    background: rgba(255,152,0,0.15);
+    border: 1px solid rgba(255,152,0,0.3);
+    color: #ff9800;
+    font-size: 10px; font-family: 'Barlow Condensed', sans-serif;
+    letter-spacing: 2px; text-transform: uppercase;
+    padding: 1px 8px; vertical-align: middle; margin: 0 4px;
+  }
+  .prize-val {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px; color: var(--yellow); letter-spacing: 2px;
+  }
+
+  .scroll-cta { display:flex; flex-direction:column; align-items:center; gap:8px; color:var(--text-muted); font-family:'Barlow Condensed',sans-serif; letter-spacing:3px; font-size:11px; text-transform:uppercase; animation:bounce 2s ease-in-out infinite; }
+  @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(6px)} }
+
+  /* FORM SECTION */
+  .form-section { background:var(--deep); position:relative; padding:80px 24px 100px; }
+  .form-section::before { content:''; position:absolute; top:0;left:0;right:0; height:4px; background:linear-gradient(90deg,var(--yellow),var(--blue-light),var(--yellow)); }
+  .form-header { text-align:center; margin-bottom:60px; }
+  .form-header-label { font-family:'Barlow Condensed',sans-serif; font-size:12px; letter-spacing:5px; color:var(--blue-bright); text-transform:uppercase; margin-bottom:12px; }
+  .form-header h2 { font-family:'Bebas Neue',sans-serif; font-size:clamp(42px,8vw,80px); letter-spacing:4px; }
+  .form-header h2 span { color:var(--yellow); }
+
+  form { max-width:780px; margin:0 auto; display:flex; flex-direction:column; }
+
+  .form-block { border:1px solid var(--gray); margin-bottom:2px; overflow:hidden; transition:border-color 0.2s; }
+  .form-block:focus-within { border-color:var(--yellow); }
+  .form-block-header { background:var(--gray); padding:14px 24px; display:flex; align-items:center; gap:12px; }
+  .form-block-num { font-family:'Bebas Neue',sans-serif; font-size:18px; color:var(--yellow); min-width:24px; }
+  .form-block-title { font-family:'Barlow Condensed',sans-serif; font-size:14px; letter-spacing:3px; text-transform:uppercase; }
+  .form-block-required { margin-left:auto; font-size:10px; font-family:'Barlow Condensed',sans-serif; letter-spacing:2px; color:var(--yellow); text-transform:uppercase; }
+  .form-block-body { padding:24px; background:#141414; }
+
+  .field-group { display:grid; grid-template-columns:1fr; gap:16px; }
+  .field-group.two-col { grid-template-columns:1fr 1fr; }
+  @media(max-width:580px){ .field-group.two-col { grid-template-columns:1fr; } }
+
+  .field { display:flex; flex-direction:column; gap:6px; }
+  label { font-family:'Barlow Condensed',sans-serif; font-size:11px; letter-spacing:2.5px; text-transform:uppercase; color:var(--text-muted); }
+  label .req { color:var(--yellow); margin-left:2px; }
+
+  input[type="text"], input[type="email"], input[type="tel"], input[type="url"], textarea, select {
+    background:var(--black); border:1px solid var(--gray-light); color:var(--white);
+    padding:12px 16px; font-family:'Barlow',sans-serif; font-size:15px; font-weight:300;
+    outline:none; transition:border-color 0.2s,box-shadow 0.2s; border-radius:0; width:100%; appearance:none;
+  }
+  input:focus, textarea:focus, select:focus { border-color:var(--yellow); box-shadow:0 0 0 2px rgba(255,214,0,0.08); }
+  input.v-ok { border-color:#43a047 !important; }
+  input.v-err, textarea.v-err { border-color:var(--error) !important; box-shadow:0 0 0 2px rgba(239,83,80,0.1) !important; }
+  .err-msg { font-size:11px; color:var(--error); font-family:'Barlow Condensed',sans-serif; letter-spacing:1px; display:none; margin-top:2px; }
+  .err-msg.show { display:block; }
+  textarea { resize:vertical; min-height:120px; }
+
+  .char-row { display:flex; justify-content:space-between; align-items:center; }
+  .char-counter { font-size:10px; color:var(--text-muted); font-family:'Barlow Condensed',sans-serif; }
+  .char-counter.warn { color:#ff9800; }
+  .char-counter.over { color:var(--error); }
+
+  /* teammate */
+  .teammate-block { border:1px solid var(--gray); margin-bottom:2px; overflow:hidden; }
+  .teammate-block:focus-within { border-color:var(--blue-bright); }
+  .teammate-header { background:rgba(21,101,192,0.25); border-bottom:1px solid rgba(21,101,192,0.3); padding:12px 24px; display:flex; align-items:center; gap:10px; }
+  .teammate-num { font-family:'Bebas Neue',sans-serif; font-size:16px; color:var(--blue-bright); }
+  .teammate-label { font-family:'Barlow Condensed',sans-serif; font-size:13px; letter-spacing:2px; text-transform:uppercase; color:rgba(245,245,240,0.8); }
+  .teammate-tag { margin-left:auto; font-size:9px; font-family:'Barlow Condensed',sans-serif; letter-spacing:2px; text-transform:uppercase; padding:3px 8px; }
+  .teammate-tag.req { background:rgba(255,214,0,0.15); color:var(--yellow); }
+  .teammate-tag.opt { background:rgba(255,255,255,0.05); color:var(--text-muted); }
+  .teammate-body { padding:20px 24px; background:#0e0e0e; }
+
+  /* payment */
+  .payment-block { background:linear-gradient(135deg,rgba(21,101,192,0.12),rgba(255,214,0,0.06)); border:1px solid rgba(255,214,0,0.25); padding:32px; margin-bottom:2px; position:relative; overflow:hidden; }
+  .payment-block::before { content:'₹'; position:absolute; right:24px; top:50%; transform:translateY(-50%); font-family:'Bebas Neue',sans-serif; font-size:120px; color:rgba(255,214,0,0.04); pointer-events:none; }
+  .payment-amount { font-family:'Bebas Neue',sans-serif; font-size:64px; color:var(--yellow); line-height:1; margin-bottom:4px; }
+  .payment-desc { font-size:13px; color:var(--text-muted); margin-bottom:20px; font-weight:300; line-height:1.6; }
+  .payment-desc strong { color:var(--white); }
+  .payment-upi-info { background:rgba(0,0,0,0.4); border:1px solid var(--gray); padding:14px 18px; margin-bottom:20px; display:inline-block; }
+  .payment-upi-info p { font-size:12px; color:var(--text-muted); letter-spacing:1px; font-family:'Barlow Condensed',sans-serif; text-transform:uppercase; margin-bottom:4px; }
+  .payment-upi-info span { font-family:'Barlow Condensed',sans-serif; font-size:18px; color:var(--yellow); letter-spacing:2px; }
+
+  /* upload zone */
+  .upload-zone { border:2px dashed var(--gray-light); background:var(--black); padding:32px 20px; text-align:center; cursor:pointer; transition:border-color 0.2s,background 0.2s; }
+  .upload-zone:hover, .upload-zone.dragover { border-color:var(--yellow); background:rgba(255,214,0,0.03); }
+  .upload-zone.has-file { border-color:var(--success); border-style:solid; background:rgba(67,160,71,0.04); }
+  .upload-zone.zone-err { border-color:var(--error); }
+  .upload-icon { font-size:32px; margin-bottom:10px; }
+  .upload-label { font-family:'Barlow Condensed',sans-serif; font-size:14px; letter-spacing:2px; color:var(--text-muted); text-transform:uppercase; }
+  .upload-label span { color:var(--yellow); }
+  .upload-hint { font-size:11px; color:#555; margin-top:6px; }
+  .upload-preview { display:none; margin-top:20px; }
+  .upload-preview.show { display:block; }
+  .upload-preview img { max-width:100%; max-height:220px; object-fit:contain; border:1px solid var(--gray); display:block; margin:0 auto 10px; }
+  .file-name { font-size:12px; color:var(--success); font-family:'Barlow Condensed',sans-serif; letter-spacing:1px; text-align:center; margin-bottom:8px; }
+  .remove-btn { background:none; border:1px solid var(--error); color:var(--error); font-size:11px; padding:5px 14px; cursor:pointer; font-family:'Barlow Condensed',sans-serif; letter-spacing:1px; display:block; margin:0 auto; }
+
+  /* divider */
+  .divider { display:flex; align-items:center; gap:16px; margin:40px 0; max-width:780px; margin-left:auto; margin-right:auto; }
+  .divider-line { flex:1; height:1px; background:var(--gray); }
+  .divider-text { font-family:'Bebas Neue',sans-serif; font-size:14px; letter-spacing:3px; color:var(--blue-bright); text-transform:uppercase; }
+  .team-notice { background:rgba(21,101,192,0.1); border:1px solid rgba(21,101,192,0.25); padding:14px 20px; margin-bottom:16px; font-size:13px; color:rgba(245,245,240,0.65); line-height:1.6; font-weight:300; }
+  .team-notice strong { color:var(--blue-bright); }
+  .optional-toggle { display:flex; align-items:center; gap:12px; padding:12px 0; cursor:pointer; user-select:none; }
+  .optional-toggle input { width:18px; height:18px; cursor:pointer; accent-color:var(--blue-bright); }
+  .optional-toggle span { font-size:13px; color:rgba(245,245,240,0.5); font-family:'Barlow Condensed',sans-serif; letter-spacing:2px; text-transform:uppercase; }
+  .collapsible { display:none; }
+  .collapsible.shown { display:block; }
+
+  /* submit */
+  .submit-area { margin-top:8px; display:flex; flex-direction:column; align-items:center; gap:16px; }
+  .submit-btn { background:var(--yellow); color:var(--black); border:none; padding:18px 60px; font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:4px; cursor:pointer; transition:transform 0.15s,box-shadow 0.15s; width:100%; max-width:420px; clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%); }
+  .submit-btn:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 8px 32px rgba(255,214,0,0.25); }
+  .submit-btn:disabled { opacity:0.7; cursor:not-allowed; }
+  .submit-note { font-size:12px; color:var(--text-muted); text-align:center; line-height:1.6; max-width:420px; font-weight:300; }
+
+  /* progress */
+  .progress-bar { position:fixed; top:0; left:0; height:3px; background:var(--yellow); z-index:9999; transition:width 0.1s; }
+
+  /* footer */
+  footer { background:var(--black); border-top:1px solid var(--gray); padding:40px 24px; text-align:center; }
+  footer .footer-logo { font-family:'Bebas Neue',sans-serif; font-size:32px; letter-spacing:6px; color:var(--yellow); margin-bottom:8px; }
+  footer p { font-size:12px; color:var(--text-muted); letter-spacing:1px; font-weight:300; }
+
+  /* toast */
+  #toast { position:fixed; bottom:80px; left:50%; transform:translateX(-50%) translateY(20px); background:#1B5E20; color:#fff; padding:14px 28px; font-family:'Barlow Condensed',sans-serif; font-size:14px; letter-spacing:2px; opacity:0; transition:all 0.4s; z-index:9999; box-shadow:0 4px 24px rgba(0,0,0,0.4); pointer-events:none; }
+
+  /* admin btn */
+  #adminBtn { position:fixed; bottom:24px; right:24px; z-index:1000; background:var(--blue); color:#fff; border:none; padding:12px 20px; cursor:pointer; font-family:'Barlow Condensed',sans-serif; font-size:13px; letter-spacing:2px; text-transform:uppercase; box-shadow:0 4px 20px rgba(21,101,192,0.4); transition:background 0.2s; }
+  #adminBtn:hover { background:var(--blue-light); }
+
+  /* admin overlay */
+  #adminOverlay { display:none; position:fixed; inset:0; z-index:9000; background:rgba(0,0,0,0.96); flex-direction:column; font-family:'Barlow',sans-serif; }
+  .adm-hdr { background:#111; border-bottom:2px solid var(--yellow); padding:16px 28px; display:flex; align-items:center; gap:20px; flex-wrap:wrap; }
+  .adm-title { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:3px; color:var(--yellow); }
+  .adm-stats { font-size:12px; color:#888; margin-top:3px; }
+  .adm-stats b { color:var(--blue-bright); }
+  .adm-actions { margin-left:auto; display:flex; gap:10px; flex-wrap:wrap; }
+  .adm-btn { border:none; padding:10px 20px; font-family:'Barlow Condensed',sans-serif; font-size:13px; letter-spacing:2px; text-transform:uppercase; cursor:pointer; }
+  .adm-btn.y { background:var(--yellow); color:#000; font-weight:700; }
+  .adm-btn.b { background:var(--blue); color:#fff; }
+  .adm-btn.g { background:#2a2a2a; color:#fff; border:1px solid #444; }
+  .adm-body { overflow:auto; flex:1; padding:20px; }
+  .adm-table { width:100%; border-collapse:collapse; font-size:12px; min-width:1100px; }
+  .adm-table th { background:var(--blue); color:#fff; padding:10px 12px; text-align:left; white-space:nowrap; }
+  .adm-table td { padding:10px 12px; border-bottom:1px solid #1e1e1e; vertical-align:middle; }
+  .adm-table tr:hover td { background:#161616; }
+  .pay-thumb { width:64px; height:44px; object-fit:cover; cursor:pointer; border:1px solid #333; display:block; transition:transform 0.15s,border-color 0.15s; }
+  .pay-thumb:hover { transform:scale(1.08); border-color:var(--yellow); }
+  .no-pay { font-size:10px; color:var(--error); font-family:'Barlow Condensed',sans-serif; }
+  .sbadge { font-size:10px; font-family:'Barlow Condensed',sans-serif; letter-spacing:1px; padding:3px 9px; cursor:pointer; border:none; }
+  .sbadge.pending  { background:rgba(255,152,0,0.2);  color:#ff9800; }
+  .sbadge.verified { background:rgba(67,160,71,0.2);  color:#43a047; }
+  .sbadge.rejected { background:rgba(239,83,80,0.2);  color:var(--error); }
+
+  /* lightbox */
+  #lightbox { display:none; position:fixed; inset:0; z-index:99999; background:rgba(0,0,0,0.97); align-items:center; justify-content:center; flex-direction:column; gap:16px; }
+  #lightbox.show { display:flex; }
+  #lightbox img { max-width:88vw; max-height:74vh; border:2px solid var(--yellow); object-fit:contain; }
+  .lb-info { font-family:'Barlow Condensed',sans-serif; letter-spacing:1px; color:#aaa; font-size:12px; text-align:center; max-width:600px; }
+  .lb-actions { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+  .lb-btn { border:none; padding:10px 22px; font-family:'Barlow Condensed',sans-serif; font-size:13px; letter-spacing:2px; text-transform:uppercase; cursor:pointer; }
+  .lb-btn.verify  { background:var(--success); color:#fff; }
+  .lb-btn.reject  { background:var(--error); color:#fff; }
+  .lb-btn.dl      { background:var(--yellow); color:#000; font-weight:700; }
+  .lb-btn.close   { background:#333; color:#fff; }
+
+  /* ══════════════════════════════════════════
+     MOBILE & TABLET RESPONSIVE
+  ══════════════════════════════════════════ */
+
+  /* ── Base touch improvements ── */
+  input[type="text"], input[type="email"], input[type="tel"],
+  input[type="url"], textarea, select {
+    font-size: 16px; /* prevents iOS auto-zoom on focus */
+  }
+
+  @media (max-width: 768px) {
+    /* Hero */
+    .hero { padding: 40px 20px 60px; min-height: auto; }
+    .hero-glow { width: 320px; height: 320px; }
+    .org-badge { font-size: 11px; letter-spacing: 2px; padding: 6px 14px; margin-bottom: 24px; }
+    .hero-eyebrow { font-size: 12px; letter-spacing: 4px; }
+    .hero-subtitle { letter-spacing: 4px; margin-bottom: 32px; }
+
+    /* Event detail cards - 2 per row on tablet */
+    .event-details-strip { gap: 2px; margin-bottom: 36px; }
+    .detail-card { padding: 14px 20px; min-width: 140px; flex: 1 1 calc(50% - 2px); }
+    .detail-card-value { font-size: 18px; }
+
+    /* About section */
+    .about-section { margin-bottom: 32px; }
+    .about-section p { font-size: 14px; }
+
+    /* Guidelines */
+    .guidelines-wrap { gap: 2px; margin-bottom: 12px; }
+    .gl-section-head { padding: 14px 18px; gap: 12px; }
+    .gl-section-title { font-size: 17px; }
+    .gl-grid { grid-template-columns: 1fr; }
+    .gl-grid--2 { grid-template-columns: 1fr; }
+    .gl-item { padding: 14px 16px; gap: 12px; }
+    .gl-num { font-size: 18px; min-width: 22px; }
+    .gl-text { font-size: 13px; }
+    .prize-val { font-size: 26px; }
+
+    /* Scroll CTA */
+    .scroll-cta { margin-top: 16px; }
+
+    /* Form section */
+    .form-section { padding: 48px 16px 72px; }
+    .form-header { margin-bottom: 36px; }
+
+    /* Form blocks */
+    .form-block-header { padding: 12px 16px; gap: 8px; }
+    .form-block-title { font-size: 12px; letter-spacing: 2px; }
+    .form-block-body { padding: 16px; }
+
+    /* All two-col grids collapse to single column */
+    .field-group.two-col { grid-template-columns: 1fr; }
+    .field-group.two-col .field[style*="grid-column"] { grid-column: 1 / -1; }
+
+    /* Teammate blocks */
+    .teammate-header { padding: 10px 16px; gap: 8px; }
+    .teammate-label { font-size: 11px; letter-spacing: 1px; }
+    .teammate-body { padding: 16px; }
+
+    /* Payment block */
+    .payment-block { padding: 20px 16px; }
+    .payment-block::before { font-size: 80px; right: 10px; }
+    .payment-amount { font-size: 48px; }
+    .payment-upi-info { display: block; width: 100%; }
+
+    /* Upload zone */
+    .upload-zone { padding: 24px 16px; }
+    .upload-label { font-size: 12px; letter-spacing: 1px; }
+
+    /* Submit */
+    .submit-btn { font-size: 18px; padding: 16px 32px; clip-path: none; border-radius: 0; }
+
+    /* Dividers */
+    .divider { margin: 28px 0; }
+
+    /* Team notice */
+    .team-notice { font-size: 12px; padding: 12px 14px; }
+
+    /* Optional toggle */
+    .optional-toggle span { font-size: 11px; }
+
+    /* Admin button */
+    #adminBtn { bottom: 16px; right: 16px; padding: 10px 14px; font-size: 11px; }
+
+    /* Admin overlay table - make horizontally scrollable */
+    .adm-body { padding: 12px; }
+    .adm-hdr { padding: 12px 16px; gap: 10px; }
+    .adm-title { font-size: 16px; }
+    .adm-actions { gap: 6px; }
+    .adm-btn { padding: 8px 12px; font-size: 11px; letter-spacing: 1px; }
+
+    /* Lightbox */
+    #lightbox > div { max-width: 100vw; width: 100%; }
+    #lightbox > div > div[style*="flex-direction:column"] { display: none; } /* hide side panel */
+    #lightbox img { max-height: 55vh; }
+    .lb-actions { flex-wrap: wrap; gap: 8px; padding: 12px; }
+    .lb-btn { padding: 9px 14px; font-size: 11px; flex: 1 1 calc(50% - 8px); text-align: center; }
+
+    /* Footer */
+    footer { padding: 28px 20px; }
+    footer .footer-logo { font-size: 24px; }
+  }
+
+  @media (max-width: 480px) {
+    /* Hero adjustments for small phones */
+    .hero { padding: 32px 16px 48px; }
+    .org-badge { font-size: 10px; letter-spacing: 1px; padding: 5px 10px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
+    .hero-eyebrow { font-size: 11px; letter-spacing: 3px; }
+    .hero-subtitle { letter-spacing: 3px; font-size: clamp(18px, 4vw, 28px); }
+
+    /* Stack detail cards to 1 per row on very small screens */
+    .detail-card { flex: 1 1 100%; min-width: unset; }
+
+    /* Guidelines tighter */
+    .gl-section-head { padding: 12px 14px; }
+    .gl-section-label { font-size: 9px; }
+    .gl-section-title { font-size: 15px; letter-spacing: 2px; }
+    .gl-item { padding: 12px 14px; gap: 10px; }
+    .gl-num { font-size: 16px; }
+    .gl-text { font-size: 12px; line-height: 1.65; }
+
+    /* Form tighter */
+    .form-section { padding: 36px 12px 60px; }
+    .form-block-header { padding: 10px 12px; }
+    .form-block-body { padding: 14px 12px; }
+    .teammate-header { padding: 10px 12px; }
+    .teammate-body { padding: 14px 12px; }
+    .payment-block { padding: 18px 12px; }
+    .payment-amount { font-size: 40px; }
+
+    /* Inputs readable on small screens */
+    input[type="text"], input[type="email"], input[type="tel"],
+    input[type="url"], textarea, select { padding: 11px 12px; }
+
+    /* Submit full-width, no clip-path */
+    .submit-area { padding: 0 0; }
+    .submit-btn { max-width: 100%; font-size: 16px; padding: 15px 20px; }
+
+    /* Admin button smaller */
+    #adminBtn { bottom: 12px; right: 12px; padding: 9px 12px; font-size: 10px; letter-spacing: 1px; }
+
+    /* Toast */
+    #toast { width: 90%; text-align: center; font-size: 12px; letter-spacing: 1px; padding: 12px 16px; }
+
+    /* Lightbox actions stack */
+    .lb-btn { flex: 1 1 100%; }
+  }
+
+  /* ── Lightbox mobile layout fix ── */
+  @media (max-width: 768px) {
+    #lightbox { padding: 0; align-items: flex-end; }
+    #lightbox > div { border-radius: 0; max-height: 92vh; overflow-y: auto; }
+    .lb-content-row { flex-direction: column !important; }
+    .lb-img-wrap { border-right: none !important; border-bottom: 1px solid #2a2a2a; max-height: 45vh; }
+    .lb-img-wrap img { max-height: 40vh !important; }
+    .lb-details-wrap { width: 100% !important; max-height: none !important; }
+  }
+
+  /* ── Filmstrip - reduce on mobile ── */
+  @media (max-width: 480px) {
+    .filmstrip { height: 24px; }
+    .filmstrip span { font-size: 11px; padding: 0 12px; letter-spacing: 2px; }
+  }
+
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar" style="width:0%"></div>
+
+<!-- TICKER -->
+<div class="filmstrip">
+  <div class="filmstrip-inner">
+    <span>THE BOX OFFICE</span><span>/</span><span>SHORT FILM COMPETITION</span><span>/</span>
+    <span>MIT CHENNAI</span><span>/</span><span>REGISTRATIONS OPEN</span><span>/</span>
+    <span>₹300 ENTRY FEE</span><span>/</span><span>SUBMIT YOUR STORY</span><span>/</span>
+    <span>THE BOX OFFICE</span><span>/</span><span>SHORT FILM COMPETITION</span><span>/</span>
+    <span>MIT CHENNAI</span><span>/</span><span>REGISTRATIONS OPEN</span><span>/</span>
+    <span>₹300 ENTRY FEE</span><span>/</span><span>SUBMIT YOUR STORY</span><span>/</span>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-content">
+    <div class="org-badge">The Box Office · Madras Institute of Technology</div>
+    <p class="hero-eyebrow">Presents</p>
+    <h1 class="hero-title"><span class="accent">LIGHTS</span><br><span class="line2">CAMERA</span><br>ACTION</h1>
+    <p class="hero-subtitle">Short Film Competition</p>
+    <div class="event-details-strip">
+      <div class="detail-card"><div class="detail-card-label">Organized by</div><div class="detail-card-value">THE BOX OFFICE</div></div>
+      <div class="detail-card blue-accent"><div class="detail-card-label">Institute</div><div class="detail-card-value blue">MIT, CHENNAI</div></div>
+      <div class="detail-card"><div class="detail-card-label">Entry Fee</div><div class="detail-card-value yellow">₹ 300</div></div>
+      <div class="detail-card blue-accent"><div class="detail-card-label">Team Size</div><div class="detail-card-value blue">1 – 15</div></div>
+      <div class="detail-card"><div class="detail-card-label">Format</div><div class="detail-card-value">SHORT FILM</div></div>
+    </div>
+    <div class="about-section">
+      <p>The Box Office invites filmmakers, storytellers, and creative minds to submit their short films for our annual competition at MIT, Chennai. Push boundaries, break conventions, and let your vision unfold on screen.</p>
+    </div>
+    <!-- GUIDELINES SECTION -->
+    <div class="guidelines-wrap">
+
+      <!-- SUBMISSION GUIDELINES -->
+      <div class="gl-section">
+        <div class="gl-section-head">
+          <div class="gl-section-icon">01</div>
+          <div>
+            <div class="gl-section-label">Section 01</div>
+            <div class="gl-section-title">Submission Guidelines</div>
+          </div>
+        </div>
+        <div class="gl-grid">
+          <div class="gl-item">
+            <div class="gl-num">01</div>
+            <div class="gl-text">Film duration must be between <strong>1 minute and 30 minutes</strong>, including opening and end credits.</div>
+          </div>
+          <div class="gl-item">
+            <div class="gl-num">02</div>
+            <div class="gl-text">Film must be an <strong>original work</strong>. Any copyright infringement will result in immediate disqualification.</div>
+          </div>
+          <div class="gl-item">
+            <div class="gl-num">03</div>
+            <div class="gl-text"><strong>No obscene language or explicit scenes</strong> are permitted under any circumstances.</div>
+          </div>
+          <div class="gl-item">
+            <div class="gl-num">04</div>
+            <div class="gl-text">Film is preferably in <strong>Tamil</strong>. If not in Tamil, <strong>English subtitles are mandatory</strong>.</div>
+          </div>
+          <div class="gl-item">
+            <div class="gl-num">05</div>
+            <div class="gl-text">The entire crew must be <strong>current enrolled students</strong> of their respective colleges.</div>
+          </div>
+          <div class="gl-item">
+            <div class="gl-num">06</div>
+            <div class="gl-text">Minimum recommended resolution: <strong>720p</strong>. Accepted formats: <strong>MP4, MOV</strong>, and standard video formats.</div>
+          </div>
+          <div class="gl-item">
+            <div class="gl-num">07</div>
+            <div class="gl-text">Submissions must be made through the <strong>official registration link</strong> only. No other mode of submission will be accepted.</div>
+          </div>
+          <div class="gl-item gl-item--deadline">
+            <div class="gl-num">08</div>
+            <div class="gl-text">Final submission must arrive <strong>on or before the deadline</strong>. <span class="deadline-badge">TBA</span> - <em>Late submissions will not be accepted under any circumstances.</em></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ELIGIBILITY -->
+      <div class="gl-section">
+        <div class="gl-section-head">
+          <div class="gl-section-icon">02</div>
+          <div>
+            <div class="gl-section-label">Section 02</div>
+            <div class="gl-section-title">Eligibility</div>
+          </div>
+        </div>
+        <div class="gl-grid gl-grid--2">
+          <div class="gl-item">
+            <div class="gl-num">01</div>
+            <div class="gl-text"><strong>Open to all current college students</strong> across India. No restriction on institution or stream.</div>
+          </div>
+          <div class="gl-item">
+            <div class="gl-num">02</div>
+            <div class="gl-text"><strong>Multiple film submissions are permitted</strong>. Each film requires a separate registration and payment of ₹300.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCREENING, JURY & AWARDS -->
+      <div class="gl-section">
+        <div class="gl-section-head">
+          <div class="gl-section-icon">03</div>
+          <div>
+            <div class="gl-section-label">Section 03</div>
+            <div class="gl-section-title">Screening, Jury & Awards</div>
+          </div>
+        </div>
+        <div class="gl-grid">
+          <div class="gl-item">
+            <div class="gl-num">01</div>
+            <div class="gl-text">All submissions will be reviewed by the <strong>organizing jury</strong> and shortlisted films will be selected.</div>
+          </div>
+          <div class="gl-item">
+            <div class="gl-num">02</div>
+            <div class="gl-text">All films will be screened on event day. Only <strong>shortlisted films</strong> will be screened in the presence of judges.</div>
+          </div>
+          <div class="gl-item">
+            <div class="gl-num">03</div>
+            <div class="gl-text">Shortlisted films will be evaluated by <strong>Industry Professionals</strong>. Their decision is final and binding.</div>
+          </div>
+          <div class="gl-item">
+            <div class="gl-num">04</div>
+            <div class="gl-text">Awards will be decided and announced <strong>on the event day</strong> itself.</div>
+          </div>
+          <div class="gl-item gl-item--prize">
+            <div class="gl-num prize-num">-</div>
+            <div class="gl-text">Total Prize Pool: <strong class="prize-val">₹5,000+</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- REGISTRATION TERMS -->
+      <div class="gl-section">
+        <div class="gl-section-head">
+          <div class="gl-section-icon">04</div>
+          <div>
+            <div class="gl-section-label">Section 04</div>
+            <div class="gl-section-title">Registration Terms</div>
+          </div>
+        </div>
+        <div class="gl-grid gl-grid--2">
+          <div class="gl-item">
+            <div class="gl-num">01</div>
+            <div class="gl-text">Registration fee is <strong>₹300 per submission</strong> and is strictly <strong>non-refundable</strong> under any circumstances.</div>
+          </div>
+          <div class="gl-item">
+            <div class="gl-num">02</div>
+            <div class="gl-text">Filmmakers <strong>retain full ownership</strong> of their films. The Box Office claims no rights over submitted content.</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /.guidelines-wrap -->
+
+    <div class="scroll-cta" style="margin-top:20px;">
+      <span>Register Now</span>
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10l6 6 6-6" stroke="#888" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+  </div>
+</section>
+
+<!-- FORM -->
+<section class="form-section">
+  <div class="form-header">
+    <div class="form-header-label">Step into the frame</div>
+    <h2>REGISTER <span>NOW</span></h2>
+  </div>
+
+  <form id="regForm" onsubmit="handleSubmit(event)" novalidate>
+
+    <!-- FILM DETAILS -->
+    <div class="form-block">
+      <div class="form-block-header">
+        <div class="form-block-num">01</div>
+        <div class="form-block-title">Film Details</div>
+        <div class="form-block-required">Required</div>
+      </div>
+      <div class="form-block-body">
+        <div class="field-group">
+          <div class="field">
+            <label for="filmName">Short Film Name <span class="req">*</span></label>
+            <input type="text" id="filmName" name="filmName" placeholder="Enter your film's title" maxlength="120"
+              oninput="vField(this)" onblur="vField(this)">
+            <span class="err-msg" id="e-filmName">Film name is required (max 120 characters).</span>
+          </div>
+          <div class="field">
+            <label for="synopsis">Synopsis <span class="req">*</span></label>
+            <textarea id="synopsis" name="synopsis" rows="6" maxlength="3000"
+              placeholder="Describe your film - story, themes, tone. (50–500 words recommended)"
+              oninput="vSynopsis(this)" onblur="vSynopsis(this)"></textarea>
+            <div class="char-row">
+              <span class="err-msg" id="e-synopsis" style="display:none;">Synopsis must be at least 50 characters.</span>
+              <span class="char-counter" id="synCount">0 / 3000</span>
+            </div>
+          </div>
+          <div class="field">
+            <label for="filmLink">YouTube / Google Drive Link <span class="req">*</span></label>
+            <input type="url" id="filmLink" name="filmLink"
+              placeholder="https://youtube.com/watch?v=... or https://drive.google.com/..."
+              oninput="vFilmLink(this)" onblur="vFilmLink(this)">
+            <span class="err-msg" id="e-filmLink">Enter a valid YouTube (youtube.com / youtu.be) or Google Drive URL.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TEAM DIVIDER -->
+    <div class="divider"><div class="divider-line"></div><div class="divider-text">Team Members</div><div class="divider-line"></div></div>
+    <div style="max-width:780px;margin:0 auto 16px;">
+      <div class="team-notice"><strong>Members 1–4 are compulsory.</strong> Members 1 & 2 require full contact details. Members 3 & 4 need name, role, and college. Members 5–15 are optional.</div>
+    </div>
+
+    <!-- TM1 -->
+    <div class="teammate-block">
+      <div class="teammate-header"><div class="teammate-num">TM 01</div><div class="teammate-label">Primary Contact - Team Lead</div><div class="teammate-tag req">Required</div></div>
+      <div class="teammate-body">
+        <div class="field-group two-col">
+          <div class="field">
+            <label>Full Name <span class="req">*</span></label>
+            <input type="text" name="tm1_name" placeholder="Full name" oninput="vName(this)" onblur="vName(this)">
+            <span class="err-msg">Valid name required (letters only, min 2 characters).</span>
+          </div>
+          <div class="field">
+            <label>Phone Number <span class="req">*</span></label>
+            <input type="tel" name="tm1_phone" placeholder="+91 XXXXX XXXXX" oninput="vPhone(this)" onblur="vPhone(this)">
+            <span class="err-msg">Enter a valid 10-digit Indian mobile number.</span>
+          </div>
+          <div class="field">
+            <label>Email Address <span class="req">*</span></label>
+            <input type="email" name="tm1_email" placeholder="name@college.edu" oninput="vEmail(this)" onblur="vEmail(this)">
+            <span class="err-msg">Enter a valid email address (e.g. <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="f39d929e96b3979c9e929a9ddd909c9e">[email&#160;protected]</a>).</span>
+          </div>
+          <div class="field">
+            <label>Role in Film <span class="req">*</span></label>
+            <input type="text" name="tm1_role" placeholder="Director, DOP, Editor…" oninput="vRole(this)" onblur="vRole(this)">
+            <span class="err-msg">Please enter a role (min 2 characters).</span>
+          </div>
+          <div class="field" style="grid-column:1/-1">
+            <label>College / Institution <span class="req">*</span></label>
+            <input type="text" name="tm1_college" placeholder="College name" oninput="vCollege(this)" onblur="vCollege(this)">
+            <span class="err-msg">Please enter the college / institution name.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TM2 -->
+    <div class="teammate-block">
+      <div class="teammate-header"><div class="teammate-num">TM 02</div><div class="teammate-label">Secondary Contact</div><div class="teammate-tag req">Required</div></div>
+      <div class="teammate-body">
+        <div class="field-group two-col">
+          <div class="field">
+            <label>Full Name <span class="req">*</span></label>
+            <input type="text" name="tm2_name" placeholder="Full name" oninput="vName(this)" onblur="vName(this)">
+            <span class="err-msg">Valid name required (letters only, min 2 characters).</span>
+          </div>
+          <div class="field">
+            <label>Phone Number <span class="req">*</span></label>
+            <input type="tel" name="tm2_phone" placeholder="+91 XXXXX XXXXX" oninput="vPhone(this)" onblur="vPhone(this); vDuplicate()">
+            <span class="err-msg">Enter a valid 10-digit Indian mobile number.</span>
+          </div>
+          <div class="field">
+            <label>Email Address <span class="req">*</span></label>
+            <input type="email" name="tm2_email" placeholder="name@college.edu" oninput="vEmail(this)" onblur="vEmail(this); vDuplicate()">
+            <span class="err-msg">Enter a valid email address.</span>
+          </div>
+          <div class="field">
+            <label>Role in Film <span class="req">*</span></label>
+            <input type="text" name="tm2_role" placeholder="Producer, Writer, Sound…" oninput="vRole(this)" onblur="vRole(this)">
+            <span class="err-msg">Please enter a role (min 2 characters).</span>
+          </div>
+          <div class="field" style="grid-column:1/-1">
+            <label>College / Institution <span class="req">*</span></label>
+            <input type="text" name="tm2_college" placeholder="College name" oninput="vCollege(this)" onblur="vCollege(this)">
+            <span class="err-msg">Please enter the college / institution name.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TM3 -->
+    <div class="teammate-block">
+      <div class="teammate-header"><div class="teammate-num">TM 03</div><div class="teammate-label">Team Member 3</div><div class="teammate-tag req">Required</div></div>
+      <div class="teammate-body">
+        <div class="field-group two-col">
+          <div class="field">
+            <label>Full Name <span class="req">*</span></label>
+            <input type="text" name="tm3_name" placeholder="Full name" oninput="vName(this)" onblur="vName(this)">
+            <span class="err-msg">Valid name required.</span>
+          </div>
+          <div class="field">
+            <label>Role in Film <span class="req">*</span></label>
+            <input type="text" name="tm3_role" placeholder="Actor, Cinematographer…" oninput="vRole(this)" onblur="vRole(this)">
+            <span class="err-msg">Please enter a role.</span>
+          </div>
+          <div class="field" style="grid-column:1/-1">
+            <label>College / Institution <span class="req">*</span></label>
+            <input type="text" name="tm3_college" placeholder="College name" oninput="vCollege(this)" onblur="vCollege(this)">
+            <span class="err-msg">Please enter the college name.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TM4 -->
+    <div class="teammate-block">
+      <div class="teammate-header"><div class="teammate-num">TM 04</div><div class="teammate-label">Team Member 4</div><div class="teammate-tag req">Required</div></div>
+      <div class="teammate-body">
+        <div class="field-group two-col">
+          <div class="field">
+            <label>Full Name <span class="req">*</span></label>
+            <input type="text" name="tm4_name" placeholder="Full name" oninput="vName(this)" onblur="vName(this)">
+            <span class="err-msg">Valid name required.</span>
+          </div>
+          <div class="field">
+            <label>Role in Film <span class="req">*</span></label>
+            <input type="text" name="tm4_role" placeholder="Composer, Art Director…" oninput="vRole(this)" onblur="vRole(this)">
+            <span class="err-msg">Please enter a role.</span>
+          </div>
+          <div class="field" style="grid-column:1/-1">
+            <label>College / Institution <span class="req">*</span></label>
+            <input type="text" name="tm4_college" placeholder="College name" oninput="vCollege(this)" onblur="vCollege(this)">
+            <span class="err-msg">Please enter the college name.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OPTIONAL TM 5–15 -->
+    <div style="max-width:780px;margin:8px auto 0;">
+      <label class="optional-toggle">
+        <input type="checkbox" id="toggleOpt" onchange="toggleOptional()">
+        <span>Add more team members (Members 5–15) - optional</span>
+      </label>
+    </div>
+    <div id="optBlock" class="collapsible">
+      <div id="dynTM"></div>
+    </div>
+
+    <!-- PAYMENT -->
+    <div class="divider"><div class="divider-line"></div><div class="divider-text">Payment</div><div class="divider-line"></div></div>
+    <div class="payment-block">
+      <div class="payment-amount">₹300</div>
+      <div class="payment-desc">
+        <strong>Registration Fee - Non-refundable.</strong><br>
+        Pay via UPI or bank transfer. Then upload a clear screenshot of the <strong>successful transaction confirmation</strong>. Our team will manually review each payment before confirming your registration.
+      </div>
+      <div class="payment-upi-info">
+        <p>Pay to</p>
+        <span>THE BOX OFFICE · MIT CHENNAI</span>
+      </div>
+      <label style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--text-muted);display:block;margin-bottom:10px;">
+        Payment Screenshot <span style="color:var(--yellow)">*</span>
+      </label>
+      <!-- Drop zone (no inner <input> to avoid double click, triggered via JS) -->
+      <div class="upload-zone" id="dropZone"
+           onclick="document.getElementById('payFile').click()"
+           ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
+        <input type="file" id="payFile" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="onFileChange(event)">
+        <div id="uploadPrompt">
+          
+          <div class="upload-label">Drop image here or <span>click to browse</span></div>
+          <div class="upload-hint">JPG · PNG · WEBP &nbsp;·&nbsp; Max 5 MB &nbsp;·&nbsp; Must show transaction confirmation clearly</div>
+        </div>
+        <div class="upload-preview" id="uploadPreview">
+          <img id="prevImg" src="" alt="Payment preview">
+          <div class="file-name" id="prevName"></div>
+          <button type="button" class="remove-btn" onclick="removeFile(event)">Remove / Re-upload</button>
+        </div>
+      </div>
+      <span class="err-msg" id="e-payment" style="margin-top:8px;">Please upload a payment screenshot (JPG / PNG / WEBP, max 5 MB).</span>
+    </div>
+
+    <!-- SUBMIT -->
+    <div class="submit-area">
+      <button type="submit" class="submit-btn" id="submitBtn">SUBMIT REGISTRATION</button>
+      <p class="submit-note">By submitting, you confirm all information is accurate and your team agrees to the competition rules. Payment is subject to manual verification by The Box Office team.</p>
+    </div>
+  </form>
+</section>
+
+<footer>
+  <div class="footer-logo">THE BOX OFFICE</div>
+  <p>Madras Institute of Technology · Chennai</p>
+  <p style="margin-top:8px;">Short Film Competition · All Rights Reserved</p>
+</footer>
+
+<!-- ADMIN BTN -->
+<button id="adminBtn" onclick="openAdmin()">Admin Panel</button>
+
+<!-- TOAST -->
+<div id="toast">Registration submitted - Awaiting payment verification.</div>
+
+<!-- LIGHTBOX - Payment Review -->
+<div id="lightbox">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:0;max-width:92vw;width:100%">
+    <!-- Header bar -->
+    <div style="background:#111;border:2px solid #FFD600;border-bottom:none;padding:12px 24px;width:100%;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;color:#FFD600;">PAYMENT REVIEW</div>
+      <div class="lb-info" id="lbInfo" style="font-size:12px;color:#aaa;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;"></div>
+    </div>
+    <!-- Content row -->
+    <div class="lb-content-row" style="display:flex;gap:0;width:100%;background:#0a0a0a;border:2px solid #FFD600;border-top:none;">
+      <!-- Screenshot -->
+      <div class="lb-img-wrap" style="flex:1;min-width:0;padding:20px;display:flex;align-items:center;justify-content:center;border-right:1px solid #2a2a2a;">
+        <img id="lbImg" src="" alt="Payment screenshot" style="max-width:100%;max-height:62vh;object-fit:contain;">
+      </div>
+      <!-- Details panel -->
+      <div class="lb-details-wrap" style="width:260px;flex-shrink:0;padding:20px;font-family:'Barlow',sans-serif;font-size:12px;overflow-y:auto;max-height:62vh;">
+        <div id="lbDetails" style="display:flex;flex-direction:column;gap:12px;"></div>
+      </div>
+    </div>
+    <!-- Actions -->
+    <div class="lb-actions" style="background:#111;border:2px solid #FFD600;border-top:none;width:100%;padding:14px 20px;">
+      <button class="lb-btn verify"  onclick="lbSetStatus('verified')">Mark Verified</button>
+      <button class="lb-btn reject"  onclick="lbSetStatus('rejected')">Mark Rejected</button>
+      <button class="lb-btn dl"      onclick="lbDownload()">Download Image</button>
+      <button class="lb-btn close"   onclick="closeLb()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN OVERLAY -->
+<div id="adminOverlay">
+  <div class="adm-hdr">
+    <div>
+      <div class="adm-title">Admin - Registrations</div>
+      <div class="adm-stats">Total: <b id="aC">0</b> &nbsp;|&nbsp; Pending: <b id="aP">0</b> &nbsp;|&nbsp; Verified: <b id="aV">0</b> &nbsp;|&nbsp; Rejected: <b id="aR">0</b></div>
+    </div>
+    <div class="adm-actions">
+      <button class="adm-btn y" onclick="exportXL()">Export Excel</button>
+      <button class="adm-btn b" onclick="exportCSV()">Export CSV</button>
+      <button class="adm-btn g" onclick="closeAdmin()">Close</button>
+    </div>
+  </div>
+  <div class="adm-body">
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+    <table class="adm-table">
+      <thead>
+        <tr>
+          <th>#</th><th>Film Name</th><th>TM1 Name</th><th>TM1 Phone</th><th>TM1 Email</th>
+          <th>Members</th><th>Film Link</th><th>Payment Screenshot</th>
+          <th>Payment Status</th><th>Submitted At</th><th>Delete</th>
+        </tr>
+      </thead>
+      <tbody id="admBody"></tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+// ─── API base (auto-detects same host) ─────────────────────────────────────
+const API = '';  // empty = same host as the page (served by server.js)
+
+// ─── Admin session token (set on login) ────────────────────────────────────
+let adminToken = null;
+
+// ═══════════════════════════════════════════
+//  PROGRESS BAR
+// ═══════════════════════════════════════════
+window.addEventListener('scroll', () => {
+  document.getElementById('progressBar').style.width =
+    (window.scrollY / (document.documentElement.scrollHeight - innerHeight) * 100) + '%';
+});
+
+// ═══════════════════════════════════════════
+//  VALIDATION — relaxed
+//  Only checks that required fields are not blank.
+//  Loose email/phone patterns — no strict regex.
+// ═══════════════════════════════════════════
+function setState(el, ok, msg) {
+  el.classList.toggle('v-ok',  ok);
+  el.classList.toggle('v-err', !ok);
+  const m = el.parentElement.querySelector('.err-msg');
+  if (m) { m.style.display = ok ? 'none' : 'block'; if (msg && !ok) m.textContent = msg; }
+  return ok;
+}
+
+// Required: just non-empty
+function vField(el)   { return setState(el, el.value.trim().length > 0, 'This field is required.'); }
+// Name: non-empty, at least 2 chars
+function vName(el)    { const v = el.value.trim(); return setState(el, v.length >= 2, 'Please enter a name (min 2 characters).'); }
+// Phone: non-empty, at least 7 digits present (loose)
+function vPhone(el)   { const d = el.value.replace(/\D/g,''); return setState(el, d.length >= 7, 'Please enter a valid phone number.'); }
+// Email: non-empty, has @ and a dot after it (loose)
+function vEmail(el)   { const v = el.value.trim(); return setState(el, v.includes('@') && v.includes('.'), 'Please enter a valid email address.'); }
+// Role: non-empty
+function vRole(el)    { return setState(el, el.value.trim().length >= 1, 'Please enter a role.'); }
+// College: non-empty
+function vCollege(el) { return setState(el, el.value.trim().length >= 2, 'Please enter the college name.'); }
+// Link: non-empty, starts with http
+function vFilmLink(el) {
+  const v = el.value.trim();
+  return setState(el, v.length > 0 && /^https?:\/\/.+/.test(v), 'Please enter a valid URL starting with https://');
+}
+// Synopsis: non-empty, at least 20 chars
+function vSynopsis(el) {
+  const chars = el.value.trim().length;
+  const words = el.value.trim().split(/\s+/).filter(w=>w).length;
+  const ctr = document.getElementById('synCount');
+  ctr.textContent = `${el.value.length} chars · ${words} words`;
+  ctr.className = 'char-counter' + (el.value.length > 2700 ? ' warn' : '') + (el.value.length >= 3000 ? ' over' : '');
+  const ok = chars >= 20;
+  const msg = document.getElementById('e-synopsis');
+  msg.textContent = 'Please enter a synopsis (min 20 characters).';
+  msg.style.display = ok ? 'none' : 'block';
+  el.classList.toggle('v-ok', ok); el.classList.toggle('v-err', !ok);
+  return ok;
+}
+
+// Optional: pass silently if empty
+function vOptName(el)   { if (!el.value.trim()) { el.classList.remove('v-ok','v-err'); const m=el.parentElement.querySelector('.err-msg'); if(m)m.style.display='none'; return true; } return vName(el); }
+function vOptRole(el)   { if (!el.value.trim()) { el.classList.remove('v-ok','v-err'); const m=el.parentElement.querySelector('.err-msg'); if(m)m.style.display='none'; return true; } return vRole(el); }
+function vOptCollege(el){ if (!el.value.trim()) { el.classList.remove('v-ok','v-err'); const m=el.parentElement.querySelector('.err-msg'); if(m)m.style.display='none'; return true; } return vCollege(el); }
+
+// ═══════════════════════════════════════════
+//  FILE UPLOAD (preview only — actual file
+//  sent as multipart on form submit)
+// ═══════════════════════════════════════════
+let selectedFile = null;
+
+function onDragOver(e)   { e.preventDefault(); document.getElementById('dropZone').classList.add('dragover'); }
+function onDragLeave(e)  { document.getElementById('dropZone').classList.remove('dragover'); }
+function onDrop(e)       { e.preventDefault(); document.getElementById('dropZone').classList.remove('dragover'); processFile(e.dataTransfer.files[0]); }
+function onFileChange(e) { processFile(e.target.files[0]); }
+
+function processFile(file) {
+  const zone = document.getElementById('dropZone');
+  const err  = document.getElementById('e-payment');
+  if (!file) return;
+  if (!['image/jpeg','image/png','image/webp'].includes(file.type)) {
+    zone.classList.add('zone-err'); err.textContent = 'Invalid format. Use JPG, PNG, or WEBP.'; err.style.display = 'block'; return;
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    zone.classList.add('zone-err'); err.textContent = 'File too large (max 5 MB).'; err.style.display = 'block'; return;
+  }
+  selectedFile = file;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    document.getElementById('prevImg').src = ev.target.result;
+    document.getElementById('prevName').textContent = `${file.name}  (${(file.size/1024).toFixed(0)} KB)`;
+    document.getElementById('uploadPrompt').style.display = 'none';
+    document.getElementById('uploadPreview').classList.add('show');
+    zone.classList.remove('zone-err'); zone.classList.add('has-file');
+    err.style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeFile(e) {
+  if (e) e.stopPropagation();
+  selectedFile = null;
+  document.getElementById('payFile').value = '';
+  document.getElementById('prevImg').src = '';
+  document.getElementById('uploadPreview').classList.remove('show');
+  document.getElementById('uploadPrompt').style.display = '';
+  document.getElementById('dropZone').classList.remove('has-file','zone-err');
+}
+
+// ═══════════════════════════════════════════
+//  OPTIONAL TEAMMATES 5–15
+// ═══════════════════════════════════════════
+function buildOptional() {
+  const c = document.getElementById('dynTM');
+  if (c.children.length) return;
+  for (let i = 5; i <= 15; i++) {
+    const b = document.createElement('div');
+    b.className = 'teammate-block'; b.style.marginTop = '2px';
+    b.innerHTML = `
+      <div class="teammate-header">
+        <div class="teammate-num">TM ${String(i).padStart(2,'0')}</div>
+        <div class="teammate-label">Team Member ${i}</div>
+        <div class="teammate-tag opt">Optional</div>
+      </div>
+      <div class="teammate-body">
+        <div class="field-group two-col">
+          <div class="field">
+            <label>Full Name</label>
+            <input type="text" name="tm${i}_name" placeholder="Full name" oninput="vOptName(this)" onblur="vOptName(this)">
+            <span class="err-msg" style="display:none">Please enter a name.</span>
+          </div>
+          <div class="field">
+            <label>Role in Film</label>
+            <input type="text" name="tm${i}_role" placeholder="Role" oninput="vOptRole(this)" onblur="vOptRole(this)">
+            <span class="err-msg" style="display:none">Please enter a role.</span>
+          </div>
+          <div class="field" style="grid-column:1/-1">
+            <label>College / Institution</label>
+            <input type="text" name="tm${i}_college" placeholder="College name" oninput="vOptCollege(this)" onblur="vOptCollege(this)">
+            <span class="err-msg" style="display:none">Please enter the college name.</span>
+          </div>
+        </div>
+      </div>`;
+    c.appendChild(b);
+  }
+}
+function toggleOptional() {
+  const b = document.getElementById('optBlock');
+  if (document.getElementById('toggleOpt').checked) { buildOptional(); b.classList.add('shown'); }
+  else b.classList.remove('shown');
+}
+
+// ═══════════════════════════════════════════
+//  FULL SUBMIT VALIDATION
+// ═══════════════════════════════════════════
+function fullValidate() {
+  let errs = 0;
+  if (!vField(document.getElementById('filmName')))   errs++;
+  if (!vSynopsis(document.getElementById('synopsis'))) errs++;
+  if (!vFilmLink(document.getElementById('filmLink'))) errs++;
+
+  const req = [
+    [document.querySelector('[name=tm1_name]'),    vName],
+    [document.querySelector('[name=tm1_phone]'),   vPhone],
+    [document.querySelector('[name=tm1_email]'),   vEmail],
+    [document.querySelector('[name=tm1_role]'),    vRole],
+    [document.querySelector('[name=tm1_college]'), vCollege],
+    [document.querySelector('[name=tm2_name]'),    vName],
+    [document.querySelector('[name=tm2_phone]'),   vPhone],
+    [document.querySelector('[name=tm2_email]'),   vEmail],
+    [document.querySelector('[name=tm2_role]'),    vRole],
+    [document.querySelector('[name=tm2_college]'), vCollege],
+    [document.querySelector('[name=tm3_name]'),    vName],
+    [document.querySelector('[name=tm3_role]'),    vRole],
+    [document.querySelector('[name=tm3_college]'), vCollege],
+    [document.querySelector('[name=tm4_name]'),    vName],
+    [document.querySelector('[name=tm4_role]'),    vRole],
+    [document.querySelector('[name=tm4_college]'), vCollege],
+  ];
+  req.forEach(([el, fn]) => { if (!fn(el)) errs++; });
+
+  if (!selectedFile) {
+    document.getElementById('dropZone').classList.add('zone-err');
+    const e = document.getElementById('e-payment');
+    e.textContent = 'Please upload a payment screenshot before submitting.';
+    e.style.display = 'block';
+    errs++;
+  }
+  return errs;
+}
+
+// ═══════════════════════════════════════════
+//  HANDLE SUBMIT — sends to server API
+// ═══════════════════════════════════════════
+async function handleSubmit(e) {
+  e.preventDefault();
+  const errCount = fullValidate();
+  const btn = document.getElementById('submitBtn');
+
+  if (errCount > 0) {
+    const firstErr = document.querySelector('.v-err, .zone-err');
+    if (firstErr) firstErr.scrollIntoView({ behavior:'smooth', block:'center' });
+    btn.style.background = 'var(--error)';
+    btn.textContent = `Fix ${errCount} error${errCount > 1 ? 's' : ''} above`;
+    setTimeout(() => { btn.style.background = 'var(--yellow)'; btn.textContent = 'SUBMIT REGISTRATION'; }, 3500);
+    return;
+  }
+
+  // Build multipart form data for server
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+
+  const fd = new FormData(e.target);
+  fd.set('paymentFile', selectedFile, selectedFile.name);
+
+  try {
+    const res  = await fetch(`${API}/api/register`, { method: 'POST', body: fd });
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.error || 'Submission failed');
+
+    // Success
+    e.target.reset();
+    removeFile(null);
+    document.getElementById('optBlock').classList.remove('shown');
+    document.getElementById('toggleOpt').checked = false;
+    document.querySelectorAll('.v-ok,.v-err').forEach(el => el.classList.remove('v-ok','v-err'));
+    document.querySelectorAll('.err-msg').forEach(el => el.style.display = 'none');
+    document.getElementById('synCount').textContent = '0 chars · 0 words';
+
+    btn.style.background = 'var(--success)';
+    btn.textContent = 'Submitted - Pending Verification';
+    setTimeout(() => { btn.style.background = 'var(--yellow)'; btn.textContent = 'SUBMIT REGISTRATION'; btn.disabled = false; }, 6000);
+
+    const t = document.getElementById('toast');
+    t.style.opacity = '1'; t.style.transform = 'translateX(-50%) translateY(0)';
+    setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(-50%) translateY(20px)'; }, 4500);
+    setTimeout(() => window.scrollTo({ top:0, behavior:'smooth' }), 700);
+
+  } catch (err) {
+    btn.style.background = 'var(--error)';
+    btn.textContent = err.message || 'Submission failed. Please try again.';
+    btn.disabled = false;
+    setTimeout(() => { btn.style.background = 'var(--yellow)'; btn.textContent = 'SUBMIT REGISTRATION'; }, 4000);
+  }
+}
+
+// ═══════════════════════════════════════════
+//  ADMIN — login + fetch from server
+// ═══════════════════════════════════════════
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+let lbId = null, lbCurrentFile = null;
+
+async function openAdmin() {
+  const pwd = prompt('Admin password:');
+  if (!pwd) return;
+  try {
+    const res  = await fetch(`${API}/api/admin/login`, {
+      method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ password: pwd })
+    });
+    const data = await res.json();
+    if (!res.ok) { alert(data.error || 'Incorrect password'); return; }
+    adminToken = data.token;
+    document.getElementById('adminOverlay').style.display = 'flex';
+    await renderAdmin();
+  } catch { alert('Could not connect to server.'); }
+}
+function closeAdmin() { document.getElementById('adminOverlay').style.display = 'none'; }
+
+async function renderAdmin() {
+  document.getElementById('admBody').innerHTML = '<tr><td colspan="11" style="text-align:center;padding:24px;color:#888;">Loading...</td></tr>';
+  try {
+    const [regsRes, statsRes] = await Promise.all([
+      fetch(`${API}/api/admin/registrations`, { headers: { 'x-admin-token': adminToken } }),
+      fetch(`${API}/api/admin/stats`,          { headers: { 'x-admin-token': adminToken } })
+    ]);
+    const regs  = await regsRes.json();
+    const stats = await statsRes.json();
+
+    // Update stats bar
+    document.getElementById('aC').textContent = stats.total;
+    document.getElementById('aP').textContent = stats.pending;
+    document.getElementById('aV').textContent = stats.verified;
+    document.getElementById('aR').textContent = stats.rejected;
+
+    if (!regs.length) {
+      document.getElementById('admBody').innerHTML = '<tr><td colspan="11" style="text-align:center;padding:40px;color:#444;">No registrations yet.</td></tr>';
+      return;
+    }
+
+    document.getElementById('admBody').innerHTML = regs.map((r, i) => {
+      const sc = r.status || 'pending';
+      const scLabel = { pending:'Pending', verified:'Verified', rejected:'Rejected' }[sc];
+      const payCell = r.payment_file
+        ? `<img class="pay-thumb" src="${API}/uploads/${esc(r.payment_file)}" title="Click to review" onclick="openLb(${r.id})">`
+        : `<span class="no-pay">No image</span>`;
+      return `<tr>
+        <td>${i+1}</td>
+        <td style="color:var(--yellow);font-weight:600;white-space:nowrap">${esc(r.film_name)}</td>
+        <td>${esc(r.tm1_name)}</td>
+        <td>${esc(r.tm1_phone)}</td>
+        <td style="font-size:11px">${esc(r.tm1_email)}</td>
+        <td style="text-align:center">${r.total_members}</td>
+        <td><a href="${esc(r.film_link)}" target="_blank" style="color:var(--blue-bright);font-size:11px">View Link</a></td>
+        <td style="text-align:center">${payCell}</td>
+        <td><button class="sbadge ${sc}" onclick="cycleStatus(${r.id},'${sc}')" title="Click to change">${scLabel}</button></td>
+        <td style="font-size:10px;color:#555;white-space:nowrap">${r.submitted_at}</td>
+        <td><button onclick="delReg(${r.id})" style="background:#b71c1c;color:#fff;border:none;padding:4px 10px;cursor:pointer;font-size:11px">Del</button></td>
+      </tr>`;
+    }).join('');
+  } catch (err) {
+    document.getElementById('admBody').innerHTML = `<tr><td colspan="11" style="text-align:center;padding:24px;color:var(--error);">Error loading data: ${err.message}</td></tr>`;
+  }
+}
+
+async function cycleStatus(id, current) {
+  const next = { pending:'verified', verified:'rejected', rejected:'pending' }[current] || 'pending';
+  try {
+    await fetch(`${API}/api/admin/registrations/${id}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type':'application/json', 'x-admin-token': adminToken },
+      body: JSON.stringify({ status: next })
+    });
+    await renderAdmin();
+  } catch { alert('Failed to update status.'); }
+}
+
+async function delReg(id) {
+  if (!confirm('Delete this registration permanently?')) return;
+  try {
+    await fetch(`${API}/api/admin/registrations/${id}`, {
+      method: 'DELETE', headers: { 'x-admin-token': adminToken }
+    });
+    await renderAdmin();
+  } catch { alert('Failed to delete.'); }
+}
+
+// ═══════════════════════════════════════════
+//  LIGHTBOX — payment review
+// ═══════════════════════════════════════════
+async function openLb(id) {
+  try {
+    const res = await fetch(`${API}/api/admin/registrations/${id}`, { headers: { 'x-admin-token': adminToken } });
+    const r   = await res.json();
+    lbId = id;
+    lbCurrentFile = r.payment_file;
+    document.getElementById('lbImg').src = r.payment_file ? `${API}/uploads/${r.payment_file}` : '';
+    const sc = r.status || 'pending';
+    const scColor = { pending:'#ff9800', verified:'#43a047', rejected:'#ef5350' }[sc];
+    document.getElementById('lbInfo').innerHTML =
+      `<b style="color:var(--yellow)">${esc(r.film_name)}</b> &nbsp;·&nbsp; ${r.submitted_at}
+       &nbsp;·&nbsp; Status: <b style="color:${scColor}">${sc.toUpperCase()}</b>`;
+
+    const det = [
+      ['Film Name',    r.film_name],
+      ['Film Link',    `<a href="${esc(r.film_link)}" target="_blank" style="color:#42A5F5">Open Link</a>`],
+      ['Members',      r.total_members],
+      ['divider',''],
+      ['TM1 Name',     r.tm1_name],    ['TM1 Phone', r.tm1_phone],
+      ['TM1 Email',    r.tm1_email],   ['TM1 College', r.tm1_college],
+      ['divider',''],
+      ['TM2 Name',     r.tm2_name],    ['TM2 Phone', r.tm2_phone],
+      ['TM2 Email',    r.tm2_email],   ['TM2 College', r.tm2_college],
+      ['divider',''],
+      ['Payment File', r.payment_file],
+      ['Submitted',    r.submitted_at],
+      ['Status',       `<b style="color:${scColor}">${sc.toUpperCase()}</b>`],
+    ];
+    document.getElementById('lbDetails').innerHTML = det.map(([k,v]) =>
+      k === 'divider'
+        ? `<div style="border-top:1px solid #222;margin:4px 0"></div>`
+        : `<div><div style="font-size:9px;letter-spacing:2px;color:#555;font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;margin-bottom:2px">${k}</div>
+           <div style="color:#ddd;word-break:break-all">${v||'-'}</div></div>`
+    ).join('');
+    document.getElementById('lightbox').classList.add('show');
+  } catch { alert('Failed to load registration.'); }
+}
+function closeLb() { document.getElementById('lightbox').classList.remove('show'); lbId = null; }
+async function lbSetStatus(s) {
+  if (!lbId) return;
+  await fetch(`${API}/api/admin/registrations/${lbId}/status`, {
+    method: 'PATCH',
+    headers: { 'Content-Type':'application/json', 'x-admin-token': adminToken },
+    body: JSON.stringify({ status: s })
+  });
+  closeLb(); await renderAdmin();
+}
+function lbDownload() {
+  if (!lbCurrentFile) return;
+  const a = document.createElement('a');
+  a.href = `${API}/uploads/${lbCurrentFile}`;
+  a.download = lbCurrentFile;
+  a.target = '_blank';
+  a.click();
+}
+document.getElementById('lightbox').addEventListener('click', e => { if (e.target === document.getElementById('lightbox')) closeLb(); });
+
+// ═══════════════════════════════════════════
+//  EXCEL EXPORT (client-side from API data)
+// ═══════════════════════════════════════════
+async function exportXL() {
+  try {
+    const res  = await fetch(`${API}/api/admin/registrations`, { headers: { 'x-admin-token': adminToken } });
+    const regs = await res.json();
+    if (!regs.length) { alert('No data to export.'); return; }
+    const rows = regs.map((r, i) => ({ '#': i+1, 'Submitted': r.submitted_at, 'Status': r.status,
+      'Film Name': r.film_name, 'Synopsis': r.synopsis, 'Film Link': r.film_link, 'Payment File': r.payment_file, 'Members': r.total_members,
+      'TM1 Name':r.tm1_name,'TM1 Phone':r.tm1_phone,'TM1 Email':r.tm1_email,'TM1 Role':r.tm1_role,'TM1 College':r.tm1_college,
+      'TM2 Name':r.tm2_name,'TM2 Phone':r.tm2_phone,'TM2 Email':r.tm2_email,'TM2 Role':r.tm2_role,'TM2 College':r.tm2_college,
+      'TM3 Name':r.tm3_name,'TM3 Role':r.tm3_role,'TM3 College':r.tm3_college,
+      'TM4 Name':r.tm4_name,'TM4 Role':r.tm4_role,'TM4 College':r.tm4_college,
+      ...Object.fromEntries([...Array(11)].flatMap((_,j)=>{const n=j+5;return[[`TM${n} Name`,r[`tm${n}_name`]],[`TM${n} Role`,r[`tm${n}_role`]],[`TM${n} College`,r[`tm${n}_college`]]]}))
+    }));
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Registrations');
+    XLSX.writeFile(wb, `BoxOffice_Registrations_${new Date().toISOString().slice(0,10)}.xlsx`);
+  } catch { alert('Export failed.'); }
+}
+
+// CSV — use server direct download
+function exportCSV() {
+  if (!adminToken) return;
+  window.open(`${API}/api/admin/export/csv?token=${encodeURIComponent(adminToken)}`, '_blank');
+}
+</script>
+</body>
+</html>
